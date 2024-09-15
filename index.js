@@ -1,13 +1,13 @@
-import { getCards } from "./getCards";
-import { createTelegramPost } from "./telegram_api";
-import { getPredictionFromGenerativeModel } from "./generative_model_api";
-import { getLayoutImage } from "./image_api";
+import { getCards } from "./getCards.js";
+import { createTelegramPost } from "./telegram_api.js";
+import { getPredictionFromGenerativeModel } from "./generative_model_api.js";
+import { getLayoutImage } from "./image_api.js";
 
-function createLayout(){
+async function createLayout(){
     const layout = getCards();
-    const prediction = getPredictionFromGenerativeModel(layout);
+    const prediction = await getPredictionFromGenerativeModel(layout);
     const image = getLayoutImage(layout);
-    createTelegramPost(prediction, image);
+    await createTelegramPost(prediction, image);
 }
 
 createLayout();

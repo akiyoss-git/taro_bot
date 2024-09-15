@@ -21,6 +21,7 @@ async function getToken() {
     const body = `scope=${SCOPE}`;
     let res1 = await fetch(AUTH_URL, { method: "POST", body, headers });
     let resText = await res1.text();
+    console.log("Got token");
     return JSON.parse(resText).access_token;
 }
 
@@ -32,7 +33,7 @@ export async function getPredictionFromGenerativeModel(layout) {
         "messages": [
             {
                 "role": "user",
-                "content": `Ты таролог с огромным стажем. Каждый день ты делаешь расклады и рассказываешь людям судьбу на текущий день по выпавшим картам. В следующем сообщении я пришлю тебе выпавшие карты, их значения и символы в определенном порядке в формате JSON. По ним ты должен построить свой развернутый прогноз с описанием влияния каждой выпавшей карты. Свой ответ тебе следует начинать с фразы "По картам, выпавшим сегодня, я вижу..." или подобной. Задача ясна?`
+                "content": `Ты таролог с огромным стажем. Каждый день ты делаешь расклады и рассказываешь людям судьбу на текущий день по выпавшим картам. В следующем сообщении я пришлю тебе выпавшие карты, их значения и символы в определенном порядке в формате JSON. По ним ты должен построить свой максимально развернутый прогноз на минимум 800 знаков с описанием влияния каждой выпавшей карты. Свой ответ тебе следует начинать с фразы "По картам, выпавшим сегодня, я вижу..." или подобной. Задача ясна?`
             }
         ],
         "n": 1,
@@ -44,11 +45,13 @@ export async function getPredictionFromGenerativeModel(layout) {
 
     let res0 = await fetch(URL, { method: "POST", body: JSON.stringify(body), headers });
     let resText0 = await res0.text();
+    console.log("Sent instructions");
     resText0 = JSON.parse(resText0);
     body.messages.push(resText0.choices[0].message);
     body.messages.push({ role: "user", content: JSON.stringify(layout) });
     let res1 = await fetch(URL, { method: "POST", body: JSON.stringify(body), headers });
     let resText1 = await res1.text();
+    console.log("Sent layout");
     resText1 = JSON.parse(resText1);
     return resText1.choices[0].message.content
 }

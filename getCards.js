@@ -18,5 +18,6 @@ export function getCards() {
     for (let i = 0; i < 6; i++) {
         layout.push(cards[i]);
     }
+    console.log("Got cards: ", layout.map(card => card.name).join(", "));
     return layout;
 }

@@ -9,7 +9,7 @@ const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`
 const photoUrl = `https://api.telegram.org/bot${TOKEN}/sendPhoto?chat_id=${CHAT_ID}`
 
 function createTextMessage(prediction){
-    const sendingBody = { "chat_id": CHAT_ID, "text": "hello world!" };
+    const sendingBody = { "chat_id": CHAT_ID, "text": prediction };
     return JSON.stringify(sendingBody);
 }
 
@@ -23,10 +23,7 @@ function createImageMessage(image){
 }
 
 export async function createTelegramPost(prediction, image) {
-    let res0 = await fetch(photoUrl, createImageMessage("./image.jpg"));
-    console.log(res0);
-    let res1 = await fetch(url, { method: "POST", body: createTextMessage(prediction), headers: { "Content-Type": "application/json" } });
-    console.log(res1);
+    // let res0 = await fetch(photoUrl, createImageMessage("./image.jpg"));
+    // console.log(res0);
+    await fetch(url, { method: "POST", body: createTextMessage(prediction), headers: { "Content-Type": "application/json" } });
 }
-
-createTelegramPost()
