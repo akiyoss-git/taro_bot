@@ -12,6 +12,7 @@
   "dependencies": {
     "form-data": "^4.0.0",
     "node-fetch": "^3.3.2",
+    "python-shell": "^5.0.0",
     "uuid": "^10.0.0"
   }
 }
