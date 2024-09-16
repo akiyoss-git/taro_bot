@@ -8,22 +8,23 @@ const TEST = false;
 const TOKEN = tokens.telegram_token;
 const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`
 
-function createTextMessage(prediction, chat_id){
+async function createTextMessage(prediction, chat_id){
     const sendingBody = { "chat_id": chat_id, "text": prediction };
-    return JSON.stringify(sendingBody);
+    console.log('sending text predictions');
+    await fetch(url, { method: "POST", body: sendingBody, headers: { "Content-Type": "application/json" } });
 }
 
-function createImageMessage(imageStream, chat_id){
+async function createImageMessage(imageStream, chat_id){
     const photoUrl = `https://api.telegram.org/bot${TOKEN}/sendPhoto?chat_id=${chat_id}`
     let form = new FormData();
     form.append("photo", imageStream);
     form.append("disable_notification", "true");
-    return { method: "POST", body: form }
+    console.log('sending cards picture');
+    await fetch(photoUrl, { method: "POST", body: form });
 }
 
 export async function createTelegramPost(prediction, imageStream, isTest) {
     const CHAT_ID = isTest ? tokens.telegram_chatId_test : tokens.telegram_chatId;
-    // let res0 = await fetch(photoUrl, createImageMessage(imageStream, CHAT_ID));
-    // console.log(res0);
-    await fetch(url, { method: "POST", body: createTextMessage(prediction, CHAT_ID), headers: { "Content-Type": "application/json" } });
+    createImageMessage(imageStream, CHAT_ID);
+    createTextMessage(prediction, CHAT_ID);
 }
