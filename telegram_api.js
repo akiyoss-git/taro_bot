@@ -6,26 +6,24 @@ import FormData from "form-data";
 const TEST = false;
 
 const TOKEN = tokens.telegram_token;
-const CHAT_ID = TEST ? tokens.telegram_chatId_test : tokens.telegram_chatId;
 const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`
-const photoUrl = `https://api.telegram.org/bot${TOKEN}/sendPhoto?chat_id=${CHAT_ID}`
 
-function createTextMessage(prediction){
-    const sendingBody = { "chat_id": CHAT_ID, "text": prediction };
+function createTextMessage(prediction, chat_id){
+    const sendingBody = { "chat_id": chat_id, "text": prediction };
     return JSON.stringify(sendingBody);
 }
 
-function createImageMessage(image){
-    let readStream = fs.createReadStream("./image.jpg");
-
+function createImageMessage(imageStream, chat_id){
+    const photoUrl = `https://api.telegram.org/bot${TOKEN}/sendPhoto?chat_id=${chat_id}`
     let form = new FormData();
-    form.append("photo", readStream);
+    form.append("photo", imageStream);
     form.append("disable_notification", "true");
     return { method: "POST", body: form }
 }
 
-export async function createTelegramPost(prediction, image) {
-    // let res0 = await fetch(photoUrl, createImageMessage("./image.jpg"));
+export async function createTelegramPost(prediction, imageStream, isTest) {
+    const CHAT_ID = isTest ? tokens.telegram_chatId_test : tokens.telegram_chatId;
+    // let res0 = await fetch(photoUrl, createImageMessage(imageStream, CHAT_ID));
     // console.log(res0);
-    await fetch(url, { method: "POST", body: createTextMessage(prediction), headers: { "Content-Type": "application/json" } });
+    await fetch(url, { method: "POST", body: createTextMessage(prediction, CHAT_ID), headers: { "Content-Type": "application/json" } });
 }
