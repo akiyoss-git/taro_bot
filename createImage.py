@@ -99,14 +99,10 @@ def main():
     except FileNotFoundError:
         pass
     
-    columns = 5
-    rows = 3
     
-    horizontal_margin = 40
-    vertical_margin = 20
+    horizontal_margin = 60
+    vertical_margin = 30
 
-    # images = os.listdir('./cardImages')
-    # print(images)
     # imagePaths = sys.argv[1:]
     imagePaths = createTestImagePaths()
     print(imagePaths)
@@ -116,20 +112,16 @@ def main():
 
     shape = cv2.imread(file_name, cv2.IMREAD_COLOR).shape
 
-    big_image = numpy.zeros((shape[0] * rows + horizontal_margin * (rows + 1), 
-                             shape[1] * columns + vertical_margin * (columns + 1),
-                             shape[2]), numpy.uint8)
-    
-    big_image.fill(255)
+    big_image = cv2.imread('./background.png')
 
     
     positions = [
-        (0, 0),
-        (2, 0),
-        (4, 0),
-        (1, 1),
-        (3, 1),
-        (2, 2)
+        (2, 1),
+        (4, 1),
+        (6, 1),
+        (3, 2),
+        (5, 2),
+        (4, 3)
     ]
     
     
@@ -140,7 +132,7 @@ def main():
         x = pos_x * (shape[1] + vertical_margin) + vertical_margin
         y = pos_y * (shape[0] + horizontal_margin) + horizontal_margin
         big_image[y:y+shape[0], x:x+shape[1]] = image
-        
+    print(big_image.shape)
     cv2.imwrite('image.png', big_image)
     # f = open("demofile2.txt", "w", encoding='utf8')
     # imagePaths = sys.argv[1:]
