@@ -3,8 +3,10 @@ import fs from "fs";
 import fetch from "node-fetch";
 import FormData from "form-data";
 
+const TEST = false;
+
 const TOKEN = tokens.telegram_token;
-const CHAT_ID = tokens.telegram_chatId;
+const CHAT_ID = TEST ? tokens.telegram_chatId_test : tokens.telegram_chatId;
 const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`
 const photoUrl = `https://api.telegram.org/bot${TOKEN}/sendPhoto?chat_id=${CHAT_ID}`
 
