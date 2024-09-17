@@ -8,13 +8,13 @@ const TEST = false;
 const TOKEN = tokens.telegram_token;
 const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`
 
-async function createTextMessage(prediction, chat_id){
+async function createTextMessage(prediction, chat_id) {
     const sendingBody = { "chat_id": chat_id, "text": prediction };
     console.log('sending text predictions');
-    await fetch(url, { method: "POST", body: sendingBody, headers: { "Content-Type": "application/json" } });
+    await fetch(url, { method: "POST", body: JSON.stringify(sendingBody), headers: { "Content-Type": "application/json" } });
 }
 
-async function createImageMessage(imageStream, chat_id){
+async function createImageMessage(imageStream, chat_id) {
     const photoUrl = `https://api.telegram.org/bot${TOKEN}/sendPhoto?chat_id=${chat_id}`
     let form = new FormData();
     form.append("photo", imageStream);
@@ -26,5 +26,6 @@ async function createImageMessage(imageStream, chat_id){
 export async function createTelegramPost(prediction, imageStream, isTest) {
     const CHAT_ID = isTest ? tokens.telegram_chatId_test : tokens.telegram_chatId;
     // createImageMessage(imageStream, CHAT_ID);
-    createTextMessage(prediction, CHAT_ID);
+    // console.log(prediction)
+    await createTextMessage(prediction, CHAT_ID);
 }
