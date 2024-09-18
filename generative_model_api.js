@@ -48,7 +48,14 @@ export async function getPredictionFromGenerativeModel(layout) {
     console.log("Sent instructions");
     resText0 = JSON.parse(resText0);
     body.messages.push(resText0.choices[0].message);
-    body.messages.push({ role: "user", content: JSON.stringify(layout) });
+    const cardInfo = layout.map(card => {
+        return {
+            name: card.name,
+            symbols: card.symbols,
+            meanings: card.meanings
+        }
+    });
+    body.messages.push({ role: "user", content: JSON.stringify(cardInfo) });
     let res1 = await fetch(URL, { method: "POST", body: JSON.stringify(body), headers });
     let resText1 = await res1.text();
     console.log("Sent layout");
