@@ -48,7 +48,7 @@ testLayout = [
     },
     {
         "name": "Императрица",
-        "number": 3,
+        "number": 75,
         "suit": "Младшие арканы",
         "symbols": [
             "мать",
@@ -103,15 +103,14 @@ def main():
     horizontal_margin = 60
     vertical_margin = 30
 
-    # imagePaths = sys.argv[1:]
-    imagePaths = createTestImagePaths()
+    imagePaths = sys.argv[1:]
+    # imagePaths = createTestImagePaths()
     print(imagePaths)
-    image_objs = [cv2.imread(f'./cardImages/{filename}') for filename in imagePaths]
+    image_objs = [cv2.resize(cv2.imread(filename), (202, 352)) for filename in imagePaths]
     print(list(map(lambda img: img.shape, image_objs)))
-    file_name = os.path.join('./cardImages', f'{imagePaths[0]}')
 
-    shape = cv2.imread(file_name, cv2.IMREAD_COLOR).shape
-
+    shape = image_objs[0].shape
+    print(shape)
     big_image = cv2.imread('./background.png')
 
     
@@ -131,7 +130,13 @@ def main():
             continue
         x = pos_x * (shape[1] + vertical_margin) + vertical_margin
         y = pos_y * (shape[0] + horizontal_margin) + horizontal_margin
+        print(big_image.shape)
+        print(y)
+        print(y, shape[0]+y)
+        print(x)
+        print(x, shape[1]+x)
         big_image[y:y+shape[0], x:x+shape[1]] = image
+        
     print(big_image.shape)
     cv2.imwrite('image.png', big_image)
     # f = open("demofile2.txt", "w", encoding='utf8')

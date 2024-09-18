@@ -25,7 +25,7 @@ async function createImageMessage(imageStream, chat_id) {
 
 export async function createTelegramPost(prediction, imageStream, isTest) {
     const CHAT_ID = isTest ? tokens.telegram_chatId_test : tokens.telegram_chatId;
-    // createImageMessage(imageStream, CHAT_ID);
+    createImageMessage(imageStream, CHAT_ID);
     // console.log(prediction)
     await createTextMessage(prediction, CHAT_ID);
 }

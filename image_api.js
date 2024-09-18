@@ -1,13 +1,5 @@
 import { PythonShell } from 'python-shell'
-
-export async function getLayoutImage(layout) {
-    // const cardPaths = layout.map(card => `./cardImages/${card.name}.png`)
-    // await PythonShell.run('createImage.py', {args: cardPaths}, (err) => {
-    //     if (err) throw err;
-    // });
-    // let readStream = fs.createReadStream("./image.png");
-    // return readStream;
-}
+import { open } from 'node:fs/promises'
 
 const OPTIONS = {
     mode: 'text',
@@ -16,6 +8,18 @@ const OPTIONS = {
     scriptPath: './',
     args: []
   };
+
+export async function getLayoutImage(layout) {
+    const cardPaths = layout.map(card => `./cardImages/${card.number}.png`);
+    OPTIONS.args = cardPaths;
+    await PythonShell.run('createImage.py', OPTIONS, (err) => {
+        if (err) throw err;
+    });
+    let fd = await open("./image.png");
+    let readStream = fd.createReadStream();
+    fd.close()
+    return readStream;
+}
 
 async function pyshtest(layout) {
     OPTIONS.args = layout.map(card => `./cardImages/${card.number}.png`)
@@ -83,7 +87,7 @@ const testLayout = [
     },
     {
         "name": "Император",
-        "number": 4,
+        "number": 75,
         "suit": "Младшие арканы",
         "symbols": [
             "отец",
@@ -111,4 +115,4 @@ const testLayout = [
     }
 ]
 
-pyshtest(testLayout)
+getLayoutImage(testLayout)

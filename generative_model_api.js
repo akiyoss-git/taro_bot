@@ -53,6 +53,5 @@ export async function getPredictionFromGenerativeModel(layout) {
     let resText1 = await res1.text();
     console.log("Sent layout");
     resText1 = JSON.parse(resText1);
-    console.log(resText1)
     return resText1.choices[0].message.content
 }
