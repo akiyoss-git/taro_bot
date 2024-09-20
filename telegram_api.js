@@ -19,7 +19,7 @@ async function createImageMessage(imageStream, prediction, chat_id) {
     form.append('chat_id', chat_id);
     form.append("photo", imageStream);
     form.append('caption', prediction);
-    form.append("disable_notification", "true");
+    form.append("disable_notification", "false");
     console.log('sending cards picture');
     await fetch(photoUrl, { method: "POST", body: form, headers: form.getHeaders() });
 }
