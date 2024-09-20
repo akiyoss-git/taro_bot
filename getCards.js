@@ -21,3 +21,14 @@ export function getCards() {
     console.log("Got cards: ", layout.map(card => card.name).join(", "));
     return layout;
 }
+
+export function getTaroskopCards() {
+    let cards = taro.cards;
+    shuffle(cards);
+    let layout = [];
+    for (let i = 0; i < 12; i++) {
+        layout.push(cards[i]);
+    }
+    console.log("Got cards: ", layout.map(card => card.name).join(", "));
+    return layout;
+}
