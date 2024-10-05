@@ -67,11 +67,9 @@ export async function getPredictionFromGenerativeModel(layout, round) {
     let resText1 = await res1.text();
     console.log("Sent layout, round: "  + round);
     resText1 = JSON.parse(resText1);
-    console.log(resText1);
     let prediction = "none";
     let maxLength = 0;
     for (let pred of resText1.choices) {
-        console.log(pred.message.content.length, pred.finish_reason, pred.message.content);
         if (pred.message.content.length > 1023 || pred.message.content.length < 750) continue;
         if (pred.message.content.length > maxLength && pred.finish_reason === 'stop') {
             maxLength = pred.message.content.length;
@@ -81,12 +79,11 @@ export async function getPredictionFromGenerativeModel(layout, round) {
     if (prediction === "none") {
         res1 = await fetch(URL, { method: "POST", body: JSON.stringify(body), headers });
         resText1 = await res1.text();
-        console.log("Sent layout, round: "  + round + 1);
+        console.log("Sent layout, round: "  + (round + 1));
         resText1 = JSON.parse(resText1);
         prediction = "none";
         let maxLength = 0;
         for (let pred of resText1.choices) {
-            console.log(pred.message.content.length, pred.finish_reason, pred.message.content);
             if (pred.message.content.length > 1023 || pred.message.content.length < 750) continue;
             if (pred.message.content.length > maxLength && pred.finish_reason === 'stop') {
                 maxLength = pred.message.content.length;
@@ -102,7 +99,6 @@ export async function getPredictionFromGenerativeModel(layout, round) {
         prediction = "none";
         let maxLength = 0;
         for (let pred of resText1.choices) {
-            console.log(pred.message.content.length, pred.finish_reason, pred.message.content);
             if (pred.message.content.length > 1023 || pred.message.content.length < 750) continue;
             if (pred.message.content.length > maxLength && pred.finish_reason === 'stop') {
                 maxLength = pred.message.content.length;
