@@ -1,50 +1,30 @@
 import fetch from 'node-fetch';
 import tokens from './tokens.json' assert { type: "json" };
 import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
 
 process.env.NODE_EXTRA_CA_CERTS = path.resolve('./')
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
-const SCOPE = tokens.gigachat_scope;
-const AUTH_DATA = tokens.gigachat_auth_data;
-const URL = 'https://gigachat.devices.sberbank.ru/api/v1/chat/completions';
-const AUTH_URL = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth";
+const URL = 'https://openrouter.ai/api/v1/chat/completions';
+
 const LAYOUT_PROMPT = `Ты таролог с огромным стажем. Каждый день ты делаешь расклады и рассказываешь людям судьбу на текущий день по выпавшим картам. В следующем сообщении я пришлю тебе выпавшие карты, их значения и символы в определенном порядке в формате JSON. По ним ты должен построить свой максимально развернутый прогноз на минимум 800 знаков и максимум 1500 знаков с описанием влияния каждой выпавшей карты и тем, на что она может указывать. Свой ответ тебе следует начинать с фразы "По картам, выпавшим сегодня, я вижу следующее: " или подобной. В конце необходимо сделать вывод по предсказанию. Задача ясна?`;
 const TAROSKOP_PROMPT = `Ты таролог с огромным стажем. Каждй день ты делаешь тароскопы на все 12 знаков зодиака. Начинай каждый тароскоп с названия знака зодиака, его значка и двоеточия. Также в начале тароскопа в скобочках должно быть название выпавшей карты. Обязательно разделяй тароскопы пустыми линиями. Тароскопы не должны быть длиннее двух предложений. Тароскопы должны быть мемными, используй актуальные на текущий момент шутки. Общая длина предсказания должна быть не длиннее 1500 знаков. Следующим предложением тебе будут присланы выпавшие 12 карт в формате JSON содержащие название (ключ name), символы (ключ symbols) и значения (ключ symbols). Задача ясна?`
-
-async function getToken() {
-    const headers = {
-        "RqUID": uuidv4(),
-        "Authorization": `Basic ${AUTH_DATA}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept': 'application/json'
-    };
-    const body = `scope=${SCOPE}`;
-    let res1 = await fetch(AUTH_URL, { method: "POST", body, headers });
-    let resText = await res1.text();
-    console.log("Got token");
-    return JSON.parse(resText).access_token;
-}
+// TODO: Переделать промпт на то, чтобы я присылал 3 сообщения с картами и мне возвращались ответы конкретно по ним, и отдально ответ с итогом
 
 export async function getPredictionFromGenerativeModel(layout, round) {
-    const token = await getToken()
-    const headers = { Authorization: `Bearer ${token}` }
+    const headers = {
+        "Authorization": `Bearer ${tokens.deepseek_token}`,
+        "Content-Type": "application/json"
+    }
     let body = {
-        "model": "GigaChat",
+        "model": "deepseek/deepseek-r1",
         "messages": [
             {
                 "role": "user",
                 "content": LAYOUT_PROMPT
             }
         ],
-        "n": 3,
-        "stream": false,
-        "max_tokens": 256*3,
-        "repetition_penalty": 1,
-        "update_interval": 0
     };
-
     let res0 = await fetch(URL, { method: "POST", body: JSON.stringify(body), headers });
     let resText0 = await res0.text();
     console.log("Sent instructions, round " + round);
@@ -248,3 +228,4 @@ const timeInfo = {
 console.log(timeInfo)
 
 // getPredictionFromGenerativeModel(testLayout);
+dickpicktest();
