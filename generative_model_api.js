@@ -1,9 +1,5 @@
 import fetch from 'node-fetch';
 import tokens from './tokens.json' assert { type: "json" };
-import path from 'path';
-
-process.env.NODE_EXTRA_CA_CERTS = path.resolve('./')
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 const URL = 'https://openrouter.ai/api/v1/chat/completions';
 
@@ -24,6 +20,7 @@ export async function getPredictionFromGenerativeModel(layout, round) {
                 "content": LAYOUT_PROMPT
             }
         ],
+        max_tokens: 750
     };
     let res0 = await fetch(URL, { method: "POST", body: JSON.stringify(body), headers });
     let resText0 = await res0.text();
@@ -49,36 +46,26 @@ export async function getPredictionFromGenerativeModel(layout, round) {
     resText1 = JSON.parse(resText1);
     let prediction = "none";
     let maxLength = 0;
+    console.log(resText1);
     for (let pred of resText1.choices) {
+        console.log("Pred length == " + pred.message.content.length);
         if (pred.message.content.length > 1023 || pred.message.content.length < 750) continue;
         if (pred.message.content.length > maxLength && pred.finish_reason === 'stop') {
             maxLength = pred.message.content.length;
             prediction = pred.message.content;
         }
     };
-    if (prediction === "none") {
+    while (prediction === "none") {
+        round = round + 1;
         res1 = await fetch(URL, { method: "POST", body: JSON.stringify(body), headers });
         resText1 = await res1.text();
-        console.log("Sent layout, round: "  + (round + 1));
+        console.log("Sent layout, round: "  + round);
         resText1 = JSON.parse(resText1);
+        console.log(resText1);
+        console.log(resText1.choices);
         prediction = "none";
-        let maxLength = 0;
         for (let pred of resText1.choices) {
-            if (pred.message.content.length > 1023 || pred.message.content.length < 750) continue;
-            if (pred.message.content.length > maxLength && pred.finish_reason === 'stop') {
-                maxLength = pred.message.content.length;
-                prediction = pred.message.content;
-            }
-        };
-    }
-    if (prediction === "none") {
-        res1 = await fetch(URL, { method: "POST", body: JSON.stringify(body), headers });
-        resText1 = await res1.text();
-        console.log("Sent layout, round: "  + round + 2);
-        resText1 = JSON.parse(resText1);
-        prediction = "none";
-        let maxLength = 0;
-        for (let pred of resText1.choices) {
+            console.log("Pred length == " + pred.message.content.length);
             if (pred.message.content.length > 1023 || pred.message.content.length < 750) continue;
             if (pred.message.content.length > maxLength && pred.finish_reason === 'stop') {
                 maxLength = pred.message.content.length;
@@ -225,7 +212,4 @@ const timeInfo = {
     evening: [cardInfo[5]]
 }
 
-console.log(timeInfo)
-
-// getPredictionFromGenerativeModel(testLayout);
-dickpicktest();
+// console.log(timeInfo)
