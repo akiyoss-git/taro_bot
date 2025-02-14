@@ -3,27 +3,33 @@ import tokens from './tokens.json' assert { type: "json" };
 
 const URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-const LAYOUT_PROMPT = `Ты таролог с огромным стажем. Каждый день ты делаешь расклады и рассказываешь людям судьбу на текущий день по выпавшим картам. В следующем сообщении я пришлю тебе выпавшие карты, их значения и символы в определенном порядке в формате JSON. По ним ты должен построить свой максимально развернутый прогноз на минимум 800 знаков и максимум 1500 знаков с описанием влияния каждой выпавшей карты и тем, на что она может указывать. Свой ответ тебе следует начинать с фразы "По картам, выпавшим сегодня, я вижу следующее: " или подобной. В конце необходимо сделать вывод по предсказанию. Задача ясна?`;
+const LAYOUT_PROMPT = `Ты таролог с огромным стажем. Каждый день ты делаешь расклады и рассказываешь людям судьбу на текущий день по выпавшим картам. В следующем сообщении я пришлю тебе шесть выпавших карт, их значения и символы в определенном порядке в формате JSON. Первые три карты отвечают за утро, следующие две отвечают за день, последняя отвечает за вечер. По этой информации тебе необходимо построить прогноз длиной в 2-3 предложения на время суток. Используй смайлики в предсказаниях. Свой ответ тебе следует начинать с фразы "НАЧАЛО ПРЕДСКАЗАНИЯ". В конце необходимо сделать вывод по предсказанию. Задача ясна?`;
 const TAROSKOP_PROMPT = `Ты таролог с огромным стажем. Каждй день ты делаешь тароскопы на все 12 знаков зодиака. Начинай каждый тароскоп с названия знака зодиака, его значка и двоеточия. Также в начале тароскопа в скобочках должно быть название выпавшей карты. Обязательно разделяй тароскопы пустыми линиями. Тароскопы не должны быть длиннее двух предложений. Тароскопы должны быть мемными, используй актуальные на текущий момент шутки. Общая длина предсказания должна быть не длиннее 1500 знаков. Следующим предложением тебе будут присланы выпавшие 12 карт в формате JSON содержащие название (ключ name), символы (ключ symbols) и значения (ключ symbols). Задача ясна?`
 // TODO: Переделать промпт на то, чтобы я присылал 3 сообщения с картами и мне возвращались ответы конкретно по ним, и отдально ответ с итогом
-
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 export async function getPredictionFromGenerativeModel(layout, round) {
     const headers = {
-        "Authorization": `Bearer ${tokens.deepseek_token}`,
+        "Authorization": `Bearer ${tokens.deepseek_token_2}`,
         "Content-Type": "application/json"
     }
+    console.log(headers)
     let body = {
-        "model": "deepseek/deepseek-r1",
+        "model": "deepseek/deepseek-r1:free",
         "messages": [
             {
                 "role": "user",
                 "content": LAYOUT_PROMPT
             }
         ],
-        max_tokens: 750
+        stream: false,
+        include_reasoning: false
     };
     let res0 = await fetch(URL, { method: "POST", body: JSON.stringify(body), headers });
+    console.log(res0);
     let resText0 = await res0.text();
+    console.log(resText0);
     console.log("Sent instructions, round " + round);
     resText0 = JSON.parse(resText0);
     body.messages.push(resText0.choices[0].message);
@@ -40,40 +46,54 @@ export async function getPredictionFromGenerativeModel(layout, round) {
         evening: [cardInfo[5]]
     }
     body.messages.push({ role: "user", content: JSON.stringify(timeInfo) });
+    await sleep(30000);
     let res1 = await fetch(URL, { method: "POST", body: JSON.stringify(body), headers });
+    console.log(res1)
     let resText1 = await res1.text();
-    console.log("Sent layout, round: "  + round);
+    console.log("Sent layout, round: " + round);
     resText1 = JSON.parse(resText1);
     let prediction = "none";
     let maxLength = 0;
     console.log(resText1);
-    for (let pred of resText1.choices) {
-        console.log("Pred length == " + pred.message.content.length);
-        if (pred.message.content.length > 1023 || pred.message.content.length < 750) continue;
-        if (pred.message.content.length > maxLength && pred.finish_reason === 'stop') {
-            maxLength = pred.message.content.length;
-            prediction = pred.message.content;
-        }
-    };
-    while (prediction === "none") {
-        round = round + 1;
-        res1 = await fetch(URL, { method: "POST", body: JSON.stringify(body), headers });
-        resText1 = await res1.text();
-        console.log("Sent layout, round: "  + round);
-        resText1 = JSON.parse(resText1);
-        console.log(resText1);
-        console.log(resText1.choices);
-        prediction = "none";
+    if (resText1?.error?.code === 429) {
+        sleep(30000)
+    } else {
         for (let pred of resText1.choices) {
             console.log("Pred length == " + pred.message.content.length);
             if (pred.message.content.length > 1023 || pred.message.content.length < 750) continue;
-            if (pred.message.content.length > maxLength && pred.finish_reason === 'stop') {
+            if (pred.finish_reason === 'stop') {
                 maxLength = pred.message.content.length;
                 prediction = pred.message.content;
             }
         };
     }
-    return prediction;
+    while (prediction === "none") {
+        round = round + 1;
+        try {
+            await sleep(30000);
+            res1 = await fetch(URL, { method: "POST", body: JSON.stringify(body), headers });
+            resText1 = await res1.text();
+            console.log("Sent layout, round: " + round);
+            resText1 = JSON.parse(resText1);
+            console.log(resText1);
+            console.log(resText1.choices);
+            for (let pred of resText1.choices) {
+                let msg = pred.message.content.split('НАЧАЛО ПРЕДСКАЗАНИЯ')[1]
+                console.log("Pred length == " + msg.length);
+                if (msg.length > 1023 || msg.length < 750) continue;
+                if (msg.length > maxLength && pred.finish_reason === 'stop') {
+                    maxLength = msg.length;
+                    prediction = msg;
+                    break;
+                }
+            };
+            console.log(prediction);
+        } catch (e) {
+            console.log(e);
+            continue;
+        }
+    }
+    return prediction.replaceAll('*', '').replace('НАЧАЛО ПРЕДСКАЗАНИЯ', '');
 }
 
 export async function getTaroskopFromGenerativeModel(layout) {
@@ -213,3 +233,4 @@ const timeInfo = {
 }
 
 // console.log(timeInfo)
+// console.log(await getPredictionFromGenerativeModel(testLayout, 0));

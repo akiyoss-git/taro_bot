@@ -10,7 +10,12 @@ const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`
 async function createTextMessage(prediction, chat_id) {
     const sendingBody = { "chat_id": chat_id, "text": prediction };
     console.log('sending text predictions');
-    await fetch(url, { method: "POST", body: JSON.stringify(sendingBody), headers: { "Content-Type": "application/json" } });
+    console.log(url);
+    console.log(sendingBody);
+    const res = await fetch(url, { method: "POST", body: JSON.stringify(sendingBody), headers: { "Content-Type": "application/json" } });
+    console.log(res);
+    const resText = await res.text();
+    console.log(resText);
 }
 
 async function createImageMessage(imageStream, prediction, chat_id) {
@@ -21,7 +26,12 @@ async function createImageMessage(imageStream, prediction, chat_id) {
     form.append('caption', prediction);
     form.append("disable_notification", "false");
     console.log('sending cards picture');
-    await fetch(photoUrl, { method: "POST", body: form, headers: form.getHeaders() });
+    console.log(photoUrl);
+    console.log(form);
+    const res = await fetch(photoUrl, { method: "POST", body: form, headers: form.getHeaders() });
+    console.log(res);
+    const resText = await res.text();
+    console.log(resText);
 }
 
 export async function createTelegramPost(prediction, imageStream, isTest) {
