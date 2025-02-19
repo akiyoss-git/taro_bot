@@ -13,7 +13,6 @@ def main():
     vertical_margin = 30
 
     imagePaths = sys.argv[1:]
-    # imagePaths = createTestImagePaths()
     print(imagePaths)
     image_objs = [cv2.resize(cv2.imread(filename), (202, 352)) for filename in imagePaths]
     print(list(map(lambda img: img.shape, image_objs)))
@@ -48,9 +47,5 @@ def main():
         
     print(big_image.shape)
     cv2.imwrite('image.png', big_image)
-    # f = open("demofile2.txt", "w", encoding='utf8')
-    # imagePaths = sys.argv[1:]
-    # f.write(" ".join(imagePaths))
-    # f.close()
 
 main()
