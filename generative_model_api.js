@@ -27,9 +27,7 @@ export async function getPredictionFromGenerativeModel(layout, round) {
         include_reasoning: false
     };
     let res0 = await fetch(URL, { method: "POST", body: JSON.stringify(body), headers });
-    console.log(res0);
     let resText0 = await res0.text();
-    console.log(resText0);
     console.log("Sent instructions, round " + round);
     resText0 = JSON.parse(resText0);
     body.messages.push(resText0.choices[0].message);
@@ -48,13 +46,11 @@ export async function getPredictionFromGenerativeModel(layout, round) {
     body.messages.push({ role: "user", content: JSON.stringify(timeInfo) });
     await sleep(30000);
     let res1 = await fetch(URL, { method: "POST", body: JSON.stringify(body), headers });
-    console.log(res1)
     let resText1 = await res1.text();
     console.log("Sent layout, round: " + round);
     resText1 = JSON.parse(resText1);
     let prediction = "none";
     let maxLength = 0;
-    console.log(resText1);
     if (resText1?.error?.code === 429) {
         sleep(30000)
     } else {

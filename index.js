@@ -7,9 +7,7 @@ async function createLayout(){
     const isTest = process.argv[3] ? process.argv[3] === '-test' ? true : false : false;
     const layout = getCards();
     const prediction = await getPredictionFromGenerativeModel(layout, 0);
-    // const prediction = "pass";
     const imageStream = await getLayoutImage(layout);
-    console.log(prediction.length);
     await createTelegramPost(prediction, imageStream, isTest);
 }
 
