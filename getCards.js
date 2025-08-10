@@ -1,4 +1,4 @@
-import taro from "./taro.json" assert { type: "json" };
+import taro from "./taro.json" with { type: "json" };
 
 function shuffle(array) {
     let currentIndex = array.length;

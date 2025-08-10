@@ -1,4 +1,4 @@
-import tokens from "./tokens.json" assert { type: "json" };
+import tokens from "./tokens.json" with { type: "json" };
 import fetch from "node-fetch";
 import FormData from "form-data"
 
@@ -29,9 +29,7 @@ async function createImageMessage(imageStream, prediction, chat_id) {
     console.log(photoUrl);
     console.log(form);
     const res = await fetch(photoUrl, { method: "POST", body: form, headers: form.getHeaders() });
-    console.log(res);
     const resText = await res.text();
-    console.log(resText);
 }
 
 export async function createTelegramPost(prediction, imageStream, isTest) {
