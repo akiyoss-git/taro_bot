@@ -16,9 +16,10 @@ export function getCards() {
     shuffle(cards);
     let layout = [];
     for (let i = 0; i < 6; i++) {
-        layout.push(cards[i]);
+        const flipped = Math.random() > 0.5 ? true : false;
+        layout.push({ ...cards[i], flipped})
     }
-    console.log("Got cards: ", layout.map(card => card.name).join(", "));
+    console.log("Got cards: ", layout.map(card => card.name + (card.flipped ? "_flip" : "")).join(", "));
     return layout;
 }
 
@@ -27,7 +28,8 @@ export function getTaroskopCards() {
     shuffle(cards);
     let layout = [];
     for (let i = 0; i < 12; i++) {
-        layout.push(cards[i]);
+        const flipped = Math.random() > 0.5 ? true : false;
+        layout.push({ ...cards[i], flipped})
     }
     console.log("Got cards: ", layout.map(card => card.name).join(", "));
     return layout;

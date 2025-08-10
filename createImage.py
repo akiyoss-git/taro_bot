@@ -2,6 +2,12 @@ import sys
 import os
 import cv2
 
+def getImage(filename):
+    src =  cv2.imread(filename["path"])
+    if (filename["flipped"]):
+        return cv2.rotate(src, cv2.ROTATE_180)
+    return src
+
 def main():
     try:
         os.remove('./image.png')
@@ -13,12 +19,15 @@ def main():
     vertical_margin = 30
 
     imagePaths = sys.argv[1:]
-    print(imagePaths)
-    image_objs = [cv2.resize(cv2.imread(filename), (202, 352)) for filename in imagePaths]
+    imagePaths_n = []
+    for path in imagePaths:
+        path_n = path.split("_")
+        imagePaths_n.append({"path": path_n[0], "flipped": True if path_n[1] == "flip" else False})
+    print(imagePaths_n)
+    image_objs = [cv2.resize(getImage(filename), (202, 352)) for filename in imagePaths_n]
     print(list(map(lambda img: img.shape, image_objs)))
 
     shape = image_objs[0].shape
-    print(shape)
     big_image = cv2.imread('./background.png')
 
     

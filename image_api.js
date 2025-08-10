@@ -12,7 +12,7 @@ const OPTIONS = {
   };
 
 export async function getLayoutImage(layout) {
-    const cardPaths = layout.map(card => `./cardImages/${card.number}.png`);
+    const cardPaths = layout.map(card => `./cardImages/${card.number}.png${card.flipped ? "_flip" : "_normal"}`);
     OPTIONS.args = cardPaths;
     await PythonShell.run('createImage.py', OPTIONS, (err) => {
         if (err) throw err;
