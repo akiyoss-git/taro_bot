@@ -26,10 +26,10 @@ async function createImageMessage(imageStream, prediction, chat_id) {
     form.append('caption', prediction);
     form.append("disable_notification", "false");
     console.log('sending cards picture');
-    console.log(photoUrl);
-    console.log(form);
     const res = await fetch(photoUrl, { method: "POST", body: form, headers: form.getHeaders() });
-    const resText = await res.text();
+    console.log(res.status)
+    const rt = await res.text()
+    console.log(rt)
 }
 
 export async function createTelegramPost(prediction, imageStream, isTest) {

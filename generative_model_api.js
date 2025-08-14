@@ -41,15 +41,16 @@ export async function getPredictionFromGenerativeModel(layout, round) {
     console.log("Sent layout, round: " + round);
     let prediction = "none";
     let maxLength = 0;
-    if (resText1.length < 1023 || resText1.length > 750) {
+    if (resText1.length < 1023 && resText1.length > 750) {
         maxLength = resText1.length;
         prediction = resText1;
     }
     while (prediction === "none") {
         round = round + 1;
+        console.log("Sent layout, round: " + round);
         let res1 = await model.respond(chat);
         let resText1 = res1.nonReasoningContent;
-        if (resText1.length < 1023 || resText1.length > 750) {
+        if (resText1.length < 1023 && resText1.length > 750) {
             maxLength = resText1.length;
             prediction = resText1;
         }
